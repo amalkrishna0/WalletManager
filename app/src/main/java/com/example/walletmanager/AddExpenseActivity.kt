@@ -39,8 +39,9 @@ class AddExpenseActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val date = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
-            val expense = Expense(amount, description, date)
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+            val expense = Expense(amount, description, date, time)
 
             val resultIntent = Intent().apply {
                 putExtra("expense", expense)

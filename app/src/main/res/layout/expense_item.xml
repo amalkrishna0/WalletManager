@@ -38,6 +38,13 @@
             android:textSize="14sp"
             android:textColor="#888888"
             android:paddingTop="2dp" />
+        <TextView
+            android:id="@+id/textViewTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="12sp"
+            android:layout_marginTop="2dp" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
