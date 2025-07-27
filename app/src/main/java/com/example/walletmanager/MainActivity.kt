@@ -1,6 +1,7 @@
 package com.example.walletmanager
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -9,11 +10,14 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walletapp.Expense
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import java.util.concurrent.Executor
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,7 +32,9 @@ class MainActivity : AppCompatActivity() {
 
         firestore = FirebaseFirestore.getInstance()
 
-        expenseAdapter = ExpenseAdapter(expenses)
+        expenseAdapter = ExpenseAdapter(expenses) { expense ->
+            showDeleteDialog(expense)
+        }
         val recyclerView = findViewById<RecyclerView>(R.id.rvExpenses)
         val spinnerFilter = findViewById<Spinner>(R.id.spinnerFilter)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -98,9 +104,9 @@ class MainActivity : AppCompatActivity() {
 
                 expenseAdapter.updateList(filteredList)
 
-    }
+            }
 
-}
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -116,4 +122,51 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         expenseListener?.remove() // ✅ Cleanup Firestore listener
     }
+    private fun showDeleteDialog(expense: Expense) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete Expense")
+        builder.setMessage("Do you really want to delete this expense?")
+
+        builder.setPositiveButton("Delete") { _, _ ->
+            showBiometricPrompt {
+                deleteExpense(expense)
+            }
+        }
+
+        builder.setNegativeButton("Cancel", null)
+        builder.show()
+    }
+
+    private fun showBiometricPrompt(onSuccess: () -> Unit) {
+        val executor: Executor = ContextCompat.getMainExecutor(this)
+        val biometricPrompt = BiometricPrompt(this, executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    onSuccess()
+                }
+            })
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Authenticate to Delete")
+            .setDescription("Use fingerprint to confirm deletion")
+            .setNegativeButtonText("Cancel")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun deleteExpense(expense: Expense) {
+        firestore.collection("expenses")
+            .whereEqualTo("amount", expense.amount)
+            .whereEqualTo("description",expense.description)
+            .whereEqualTo("date", expense.date)
+            .whereEqualTo("time", expense.time)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    firestore.collection("expenses").document(document.id).delete()
+                }
+            }
+    }
+
 }

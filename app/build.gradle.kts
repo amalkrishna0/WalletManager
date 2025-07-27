@@ -75,4 +75,6 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
+    implementation (libs.androidx.biometric)
+
 }

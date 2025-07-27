@@ -7,6 +7,5 @@ data class Expense(
     val description: String = "",
     val date: String = "",
     val time: String? = null,
-    val timestamp: Long = System.currentTimeMillis()
-
+    val timestamp: Long = System.currentTimeMillis(),
 ) : Serializable

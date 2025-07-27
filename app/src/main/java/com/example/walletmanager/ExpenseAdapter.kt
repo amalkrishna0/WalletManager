@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walletapp.Expense
 import com.example.walletmanager.databinding.ExpenseItemBinding
 
-class ExpenseAdapter(private var expenses: List<Expense>) :
+class ExpenseAdapter(private var expenses: List<Expense> , private val onLongPress: (Expense) -> Unit) :
     RecyclerView.Adapter<ExpenseAdapter.ExpenseViewHolder>() {
 
     inner class ExpenseViewHolder(val binding: ExpenseItemBinding) :
@@ -19,6 +19,10 @@ class ExpenseAdapter(private var expenses: List<Expense>) :
 
     override fun onBindViewHolder(holder: ExpenseViewHolder, position: Int) {
         val expense = expenses[position]
+        holder.itemView.setOnClickListener {
+            onLongPress(expense)
+        }
+
         holder.binding.textViewAmount.text = "₹ ${expense.amount ?: "0.00"}"
         holder.binding.textViewDescription.text = expense.description ?: "No Description"
 
