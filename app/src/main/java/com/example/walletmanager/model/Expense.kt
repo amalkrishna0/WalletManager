@@ -8,4 +8,5 @@ data class Expense(
     val date: String = "",
     val time: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
+    val imageBase64: String = ""
 ) : Serializable

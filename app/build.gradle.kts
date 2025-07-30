@@ -76,5 +76,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation (libs.androidx.biometric)
+    implementation ("com.google.firebase:firebase-storage:20.3.0")
+    implementation ("com.google.firebase:firebase-database-ktx:21.0.0")
+
 
 }
